@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ed-Tech Platform</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #7f8c8d; }
+        .tab.active { color: #3498db; border-bottom: 3px solid #3498db; margin-bottom: -2px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .upload-area { border: 2px dashed #bdc3c7; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; transition: 0.3s; }
+        .upload-area:hover { border-color: #3498db; background-color: #f9fbfd; }
+        input[type="file"] { margin: 15px 0; }
+        button { background-color: #3498db; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .results { margin-top: 30px; display: none; }
+        .result-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
+        .result-box h3 { margin-top: 0; color: #2c3e50; }
+        .result-box pre { white-space: pre-wrap; word-wrap: break-word; font-family: inherit; line-height: 1.6; }
+        .error { color: #e74c3c; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎓 Intelligent Educational Platform</h1>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('summarize')">Summarization</div>
+        <div class="tab" onclick="switchTab('questions')">Question Generation (Coming Soon)</div>
+    </div>
+
+    <div id="summarize" class="tab-content active">
+        <form id="uploadForm" class="upload-area">
+            <h2>Upload a Document</h2>
+            <p>Supported formats: PDF, DOCX, DOC, TXT, Images (PNG/JPG)</p>
+            <input type="file" id="fileInput" name="file" accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg" required>
+            <br>
+            <button type="submit" id="submitBtn">Generate Summary</button>
+        </form>
+
+        <div id="results" class="results">
+            <div class="result-box">
+                <h3>📄 Original Extracted Text</h3>
+                <pre id="originalText">Loading...</pre>
+            </div>
+            <div class="result-box" style="border-left-color: #2ecc71;">
+                <h3>✨ AI Summary</h3>
+                <pre id="summaryText">Loading...</pre>
+            </div>
+        </div>
+        <p id="errorMsg" class="error"></p>
+    </div>
+
+    <div id="questions" class="tab-content">
+        <div style="text-align: center; padding: 50px; color: #7f8c8d;">
+            <h2>🚧 Under Construction</h2>
+            <p>This feature will generate exam questions based on the uploaded file.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('fileInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultsDiv = document.getElementById('results');
+        const errorMsg = document.getElementById('errorMsg');
+        
+        if (fileInput.files.length === 0) {
+            errorMsg.textContent = "Please select a file first!";
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing...";
+        errorMsg.textContent = "";
+        resultsDiv.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/api/summarize', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById('originalText').textContent = data.original_text;
+                document.getElementById('summaryText').textContent = data.summary;
+                resultsDiv.style.display = 'block';
+            } else {
+                errorMsg.textContent = "Error: " + data.error;
+            }
+        } catch (error) {
+            errorMsg.textContent = "Network Error: Could not connect to the API.";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Generate Summary";
+        }
+    });
+</script>
+
+</body>
+</html>

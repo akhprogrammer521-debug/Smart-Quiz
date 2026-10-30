@@ -1,0 +1,48 @@
+node_modules/
+.npm-cache/
+src/generated/prisma/
+.next/
+out/
+build/
+*.tsbuildinfo
+.env*
+!.env.example
+.DS_Store
+npm-debug.log*
+
+# Node / Next.js
+node_modules/
+.next/
+.npm-cache/
+out/
+*.tsbuildinfo
+
+# الأسرار بكل مجلدات المشروع
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# أوزان الموديلات ونتائج التدريب
+ai_services/**/model/
+ai_services/**/models/
+ai_services/**/best/
+ai_services/**/trained_model_output/
+
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin
+
+# ملفات السجلات
+*.log
+
+
+ai_services/mcq_featuer/data/final_dataset_mcq.csv

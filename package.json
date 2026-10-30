@@ -1,0 +1,43 @@
+{
+  "name": "smartquiz",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint .",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.2.0",
+    "@prisma/client": "7.2.0",
+    "@supabase/supabase-js": "^2.117.3",
+    "bcryptjs": "3.0.3",
+    "clsx": "2.1.1",
+    "dotenv": "17.2.3",
+    "framer-motion": "13.3.0",
+    "lucide-react": "1.41.0",
+    "next": "16.3.2",
+    "next-auth": "5.0.0-beta.32",
+    "pg": "8.16.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwind-merge": "3.4.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "24.19.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.2",
+    "prisma": "7.2.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}

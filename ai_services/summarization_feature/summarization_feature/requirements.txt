@@ -1,0 +1,8 @@
+flask
+google-genai
+PyMuPDF
+python-docx
+Pillow
+pytesseract
+pytest
+werkzeug

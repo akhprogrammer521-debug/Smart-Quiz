@@ -1,0 +1,22 @@
+# torch is installed separately with CUDA:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
+transformers
+peft
+accelerate
+flask
+flask-cors
+pymupdf
+python-docx
+pytesseract
+pillow
+# training script (model.py / model_v1_backup.py)
+datasets
+evaluate
+rouge_score
+bert_score
+sacrebleu
+scikit-learn
+pandas
+tqdm
+bitsandbytes
+gradio

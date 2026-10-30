@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum QuestionType {
+  SHORT_ANSWER
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+}
+
+enum QuizAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+enum GradingStatus {
+  UNGRADED
+  GRADING
+  GRADED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  documents    Document[]
+  questionSets QuestionSet[]
+  quizAttempts QuizAttempt[]
+}
+
+model Document {
+  id             String         @id @default(cuid())
+  userId         String
+  fileName       String
+  displayName    String?
+  storagePath    String         @unique
+  mimeType       String
+  fileSize       Int
+  originalText   String?
+  normalizedText String?
+  status         DocumentStatus @default(UPLOADED)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summary        Summary?
+  questionSets   QuestionSet[]
+
+  @@index([userId, deletedAt, createdAt])
+}
+
+model Summary {
+  id             String   @id @default(cuid())
+  documentId     String   @unique
+  originalText   String
+  normalizedText String
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  document       Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model QuestionSet {
+  id             String     @id @default(cuid())
+  documentId     String
+  userId         String
+  requestedCount Int
+  name           String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+  document       Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions      Question[]
+  attempts       QuizAttempt[]
+
+  @@index([documentId, deletedAt, createdAt])
+  @@index([userId, deletedAt, createdAt])
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  questionSetId String
+  position      Int
+  text          String
+  type          QuestionType @default(SHORT_ANSWER)
+  topic         String?
+  difficulty    String?
+  options       Json?
+  correctAnswer String?
+  createdAt     DateTime     @default(now())
+  questionSet   QuestionSet  @relation(fields: [questionSetId], references: [id], onDelete: Cascade)
+  answers       QuizAnswer[]
+
+  @@unique([questionSetId, position])
+}
+
+model QuizAttempt {
+  id            String            @id @default(cuid())
+  userId        String
+  questionSetId String
+  status        QuizAttemptStatus @default(IN_PROGRESS)
+  startedAt     DateTime          @default(now())
+  submittedAt   DateTime?
+  gradingStatus GradingStatus     @default(UNGRADED)
+  gradingStartedAt DateTime?
+  gradedAt      DateTime?
+  baseScore     Float?
+  bonusScore    Float?
+  totalScore    Float?
+  maximumScore  Float?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionSet   QuestionSet       @relation(fields: [questionSetId], references: [id], onDelete: Cascade)
+  answers       QuizAnswer[]
+
+  @@unique([userId, questionSetId])
+}
+
+model QuizAnswer {
+  id         String      @id @default(cuid())
+  attemptId  String
+  questionId String
+  text       String
+  basePoints Float       @default(1)
+  bonusPoints Float      @default(0)
+  earnedPoints Float?
+  isCorrect Boolean?
+  scoreRatio Float?
+  feedback   String?
+  needsReview Boolean    @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  attempt    QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question   Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+}
